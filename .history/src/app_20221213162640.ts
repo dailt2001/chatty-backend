@@ -1,5 +1,0 @@
-import express, {}
-
-class Application{
-
-}
