@@ -2,7 +2,7 @@ import cloudinary, { UploadApiResponse, UploadApiErrorResponse } from 'cloudinar
 
 export function uploads(
     file: string,
-    public_id?: string,
+    public_id?: string, // moi khi thay doi anh thi cloudinary se thay doi id ngau nhien neu ko truyen vao public id
     overwrite?: boolean,
     invalidate?: boolean
 ): Promise<UploadApiResponse | UploadApiErrorResponse | undefined> {
