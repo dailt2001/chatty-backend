@@ -20,7 +20,7 @@ const authSchema: Schema = new Schema(
         return ret;
       }
     }
-  }
+  } 
 );
 
 authSchema.pre('save', async function (this: IAuthDocument, next: () => void) {
