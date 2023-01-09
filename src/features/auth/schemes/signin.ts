@@ -15,4 +15,4 @@ const loginSchema: ObjectSchema = Joi.object().keys({
   })
 });
 
-export { loginSchema }; 
+export { loginSchema };
