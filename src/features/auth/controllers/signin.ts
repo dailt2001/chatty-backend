@@ -7,8 +7,13 @@ import { BadRequestError } from '@global/helpers/error-handler';
 import { authService } from '@service/db/auth.service';
 import { loginSchema } from '@auth/schemes/signin';
 import { IAuthDocument } from '@auth/interfaces/auth.interface';
-import { IUserDocument } from '@user/interfaces/user.interface';
+import { IResetPasswordParams, IUserDocument } from '@user/interfaces/user.interface';
 import { userService } from '@service/db/user.service';
+import { emailQueue } from '@service/queues/email.queue';
+
+import moment from 'moment';
+import publicIP from 'ip';
+import { resetPasswordTemplate } from '@service/emails/template/reset-password/reset-password';
 
 export class SignIn {
     @joiValidation(loginSchema)
@@ -34,6 +39,17 @@ export class SignIn {
             },
             config.JWT_TOKEN!
         );
+
+        const templateParams: IResetPasswordParams = {
+            username: existingUser.username,
+            email: existingUser.email,
+            ipaddress: publicIP.address(),
+            date: moment().format('DD/MM/YYYY HH:mm')
+        };
+
+        const template: string = resetPasswordTemplate.passwordResetConfirmationTemplate(templateParams);
+        emailQueue.addEmailJob('forgotPasswordEmail', { template, receiverEmail: 'rae.jones@ethereal.email', subject: 'password reset confirmation email' });
+
         req.session = { jwt: userJwt };
 
         const userDocument: IUserDocument = {
@@ -46,7 +62,7 @@ export class SignIn {
             createdAt: existingUser!.createdAt
         } as IUserDocument;
 
-        res.status(HTTP_STATUS.OK).json({
+        res.status(HTTP_STATUS.OK).json({ 
             message: 'Login successfully',
             user: userDocument,
             token: userJwt
