@@ -1,7 +1,14 @@
 {
     "cSpell.words": [
         "backoff",
+        "cloudinary",
         "HSET",
+        "IJWT",
+        "ipaddress",
+        "lcov",
+        "Manny",
+        "saferedirecturl",
+        "sendgrid",
         "signin",
         "signout",
         "ZADD"
