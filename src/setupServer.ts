@@ -20,6 +20,7 @@ import { createAdapter } from '@socket.io/redis-adapter';
 import 'express-async-errors';
 import { config } from '@root/config';
 import applicationRoutes from './routes';
+import { SocketIOPostHandler } from '@socket/post.socket';
 
 const SERVER_PORT = 5000;
 const log: Logger = config.createLogger('server');
@@ -120,13 +121,13 @@ export class ChattyServer {
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     private socketIOConnections(io: Server): void {
-        // const postSocketHandler: SocketIOPostHandler = new SocketIOPostHandler(io);
+        const postSocketHandler: SocketIOPostHandler = new SocketIOPostHandler(io);
         // const followerSocketHandler: SocketIOFollowerHandler = new SocketIOFollowerHandler(io);
         // const userSocketHandler: SocketIOUserHandler = new SocketIOUserHandler(io);
         // const chatSocketHandler: SocketIOChatHandler = new SocketIOChatHandler(io);
         // const notificationSocketHandler: SocketIONotificationHandler = new SocketIONotificationHandler();
         // const imageSocketHandler: SocketIOImageHandler = new SocketIOImageHandler();
-        // postSocketHandler.listen();
+        postSocketHandler.listen();
         // followerSocketHandler.listen();
         // userSocketHandler.listen();
         // chatSocketHandler.listen();
