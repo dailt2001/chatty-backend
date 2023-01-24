@@ -2,18 +2,27 @@
     "cSpell.words": [
         "againnnn",
         "backoff",
+        "chua",
         "cloudinary",
         "haha",
+        "HGETALL",
         "HMGET",
         "HSET",
         "IJWT",
         "ipaddress",
         "lcov",
         "Manny",
+        "nhieu",
         "saferedirecturl",
         "sendgrid",
         "signin",
         "signout",
-        "ZADD"
+        "trong",
+        "XVCJ",
+        "ZADD",
+        "ZCARD",
+        "ZCOUNT",
+        "ZRANGE",
+        "ZREM"
     ]
 }
