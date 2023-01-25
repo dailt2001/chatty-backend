@@ -1,6 +1,7 @@
 {
     "cSpell.words": [
         "againnnn",
+        "avata",
         "backoff",
         "chua",
         "cloudinary",
@@ -11,8 +12,13 @@
         "IJWT",
         "ipaddress",
         "lcov",
+        "LLEN",
+        "LPUSH",
+        "LRANGE",
+        "LREM",
         "Manny",
         "nhieu",
+        "RPUSH",
         "saferedirecturl",
         "sendgrid",
         "signin",
