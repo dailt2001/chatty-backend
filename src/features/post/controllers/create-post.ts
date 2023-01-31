@@ -3,6 +3,7 @@ import { uploads } from '@global/helpers/cloudinary-upload';
 import { BadRequestError } from '@global/helpers/error-handler';
 import { IPostDocument } from '@post/interfaces/post.interface';
 import { postSchema, postWithImageSchema } from '@post/schemes/post.schemes';
+import { imageQueue } from '@service/queues/image.queue';
 import { postQueue } from '@service/queues/post.queue';
 import { PostCache } from '@service/redis/post.cache';
 import { socketIOPostObject } from '@socket/post.socket';
@@ -17,8 +18,9 @@ export class Create {
     @joiValidation(postSchema)
     public async post(req: Request, res: Response): Promise<void> {
         const { post, bgColor, privacy, gifUrl, profilePicture, feelings } = req.body;
-        const postObjectId: ObjectId = new ObjectId(); 
-        const createdPost: IPostDocument = { //save to cache an database
+        const postObjectId: ObjectId = new ObjectId();
+        const createdPost: IPostDocument = {
+            //save to cache an database
             _id: postObjectId,
             userId: req.currentUser!.userId, // only login user can create post
             username: req.currentUser!.username,
@@ -53,27 +55,28 @@ export class Create {
             createdPost
         });
 
-        postQueue.addPostJob('savePostToDb',{
+        postQueue.addPostJob('savePostToDb', {
             key: req.currentUser!.userId,
             value: createdPost
         });
 
         res.status(HTTP_STATUS.CREATED).json({
             mes: 'Post created successfully'
-        }); 
+        });
     }
 
     @joiValidation(postWithImageSchema)
     public async postWithImage(req: Request, res: Response): Promise<void> {
         const { post, bgColor, privacy, gifUrl, profilePicture, feelings, image } = req.body;
 
-        const result: UploadApiResponse = await uploads(image) as UploadApiResponse;
-        if(!result?.public_id){
+        const result: UploadApiResponse = (await uploads(image)) as UploadApiResponse;
+        if (!result?.public_id) {
             throw new BadRequestError(result.message);
         }
 
-        const postObjectId: ObjectId = new ObjectId(); 
-        const createdPost: IPostDocument = { //save to cache an database
+        const postObjectId: ObjectId = new ObjectId();
+        const createdPost: IPostDocument = {
+            //save to cache an database
             _id: postObjectId,
             userId: req.currentUser!.userId, // only login user can create post
             username: req.currentUser!.username,
@@ -108,13 +111,19 @@ export class Create {
             createdPost
         });
 
-        postQueue.addPostJob('savePostToDb',{
+        postQueue.addPostJob('savePostToDb', {
             key: req.currentUser!.userId,
             value: createdPost
         });
         // call image queue to add image to mongodb database
+        imageQueue.addImageJob('addImageToDB', {
+            key: `${req.currentUser!.userId}`,
+            imgId: result.public_id,
+            imgVersion: result.version.toString()
+        });
+        
         res.status(HTTP_STATUS.CREATED).json({
             mes: 'Post created with image successfully'
-        }); 
+        });
     }
 }

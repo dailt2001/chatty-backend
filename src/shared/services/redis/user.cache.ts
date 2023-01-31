@@ -1,4 +1,4 @@
-import { IUserDocument } from '@user/interfaces/user.interface';
+import { INotificationSettings, ISocialLinks, IUserDocument } from '@user/interfaces/user.interface';
 import { BaseCache } from './base.cache';
 import Logger from 'bunyan';
 import { config } from '@root/config';
@@ -6,7 +6,7 @@ import { ServerError } from '@global/helpers/error-handler';
 import { Helpers } from '@global/helpers/helpers';
 
 const log: Logger = config.createLogger('userCache');
-
+type UserItem = string | ISocialLinks | INotificationSettings ;
 
 export class UserCache extends BaseCache {
     constructor() {
@@ -115,6 +115,9 @@ export class UserCache extends BaseCache {
             response.social = Helpers.parseJson(`${response.social}`);
             response.followingCount = Helpers.parseJson(`${response.followingCount}`);
             response.followersCount = Helpers.parseJson(`${response.followersCount}`);
+            response.bgImageId = Helpers.parseJson(`${response.bgImageId}`);
+            response.bgImageVersion = Helpers.parseJson(`${response.bgImageVersion}`);
+            response.profilePicture = Helpers.parseJson(`${response.profilePicture}`);
 
             return response;
         }catch(error){
@@ -122,4 +125,34 @@ export class UserCache extends BaseCache {
             throw new ServerError('Error retrieve data server');
         }
     }
+
+    public async updateSingleUserItemInCache(userId: string, prop: string, value: UserItem): Promise<IUserDocument | null> {
+        //update a field in user hash
+        //prop:field can update
+        try {
+          if (!this.client.isOpen) {
+            await this.client.connect();
+          }
+          const dataToSave: string[] = [`${prop}`, JSON.stringify(value)];
+          //HSET to update
+          await this.client.HSET(`users:${userId}`, dataToSave);
+          const response: IUserDocument = await this.getUserFromCache(userId) as IUserDocument;
+          return response;
+        } catch (error) {
+          log.error(error);
+          throw new ServerError('Server error. Try again.');
+        }
+      }
+    
+    //   public async getTotalUsersInCache(): Promise<number> {
+    //     try {
+    //       if (!this.client.isOpen) {
+    //         await this.client.connect();
+    //       }
+          
+    //     } catch (error) {
+    //       log.error(error);
+    //       throw new ServerError('Server error. Try again.');
+    //     }
+    //   }
 }
