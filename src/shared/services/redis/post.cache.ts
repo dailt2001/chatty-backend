@@ -177,7 +177,7 @@ export class PostCache extends BaseCache {
                 await this.client.connect();
             }
             // lay tat ca data lien quan den uId rieng biet
-            const reply: string[] = await this.client.ZRANGE(key, uId, uId, { REV: true, BY: 'SCORE' });
+            const reply: string[] = await this.client.ZRANGE(key, uId, uId);
             const multi: ReturnType<typeof this.client.multi> = this.client.multi();
             for (const value of reply) {
                 // lay thong tin user trong bang hash dua vao bai post
